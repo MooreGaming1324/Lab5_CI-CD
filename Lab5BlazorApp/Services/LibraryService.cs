@@ -107,9 +107,9 @@ namespace Lab5BlazorApp.Services {
 		}
 
         public void DeleteUser(User user) {
-			if (Users.Remove(user) == false) {
-				throw new Exception();
-			}
+			//if (Users.Remove(user) == false) {
+			//	throw new Exception();
+			//}
 			WriteUsers();
 		}
 
