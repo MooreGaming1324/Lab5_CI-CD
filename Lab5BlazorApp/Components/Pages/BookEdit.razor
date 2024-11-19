@@ -1,0 +1,43 @@
+﻿@page "/book/edit/{Id}"
+@using Lab5BlazorApp.Models
+@using Lab5BlazorApp.Services
+@inject ILibraryService Library
+@inject NavigationManager Navmgr
+
+<PageTitle>Edit Book</PageTitle>
+
+<h1>Edit an existing book</h1>
+
+<form @onsubmit=Submit action="/">
+    <label for="title">Title: </label>
+    <input type="text" name="title" @bind=Title required />
+    <br />    <br />
+    <label for="author">Author: </label>
+    <input type="text" name="author" @bind=Author required />
+    <br />    <br />
+    <label for="isbn">ISBN: </label>
+    <input type="text" name="isbn" @bind=ISBN required />
+    <br />    <br />
+    <input type="submit" class="btn btn-danger" />
+</form>
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    string Title { get; set; }
+    string Author { get; set; }
+    string ISBN { get; set; }
+
+    protected override void OnInitialized() {
+        Book book = Library.Books.FirstOrDefault(b => b.Id == int.Parse(Id));
+        Title = book.Title;
+        Author = book.Author;
+        ISBN = book.ISBN;
+    }
+    public void Submit() {
+        Book newbook = new Book { Id = int.Parse(Id), Title = Title, Author = Author, ISBN = ISBN };
+        Library.EditBook(newbook);
+        Navmgr.NavigateTo("/");
+    }
+}

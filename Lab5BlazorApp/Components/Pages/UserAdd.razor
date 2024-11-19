@@ -1,0 +1,30 @@
+﻿@page "/user/add"
+@using Lab5BlazorApp.Models
+@using Lab5BlazorApp.Services
+@inject ILibraryService Library
+@inject NavigationManager Navmgr
+
+<PageTitle>Add User</PageTitle>
+
+<h1>Add a new user</h1>
+
+<form @onsubmit=Submit action="/">
+    <label for="name">Name: </label>
+    <input type="text" name="name" @bind=Name required />
+    <br />    <br />
+    <label for="email">Email: </label>
+    <input type="text" name="email" @bind=Email required />
+    <br />    <br />
+    <input type="submit" class="btn btn-danger" />
+</form>
+
+
+@code {
+    string Name { get; set; }
+    string Email { get; set; }
+
+    public void Submit() {
+        Library.AddUser(Name, Email);
+        Navmgr.NavigateTo("/users");
+    }
+}

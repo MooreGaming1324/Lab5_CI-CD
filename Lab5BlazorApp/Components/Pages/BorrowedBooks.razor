@@ -1,0 +1,75 @@
+﻿@page "/borrowedbooks"
+@using Lab5BlazorApp.Models
+@using Lab5BlazorApp.Services
+@inject ILibraryService Library
+
+<PageTitle>Borrowed Books</PageTitle>
+
+<h1>Library Books borrowed</h1>
+
+<form>
+	<label for="id">User ID: </label>
+	<input type="number" min="1" name="id" @bind=Id required @oninput=Search />
+	<br />    <br />
+	<h4>@Name</h4> <br />
+	<strong>@Email</strong>
+	<br />    <br />
+</form>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th class="col-6">Title</th>
+			<th class="col-8">ISBN</th>
+			<th class="col-2">Return</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (User != null && Library.BorrowedBooks.ContainsKey(User)) {
+			@foreach (Book book in Library.BorrowedBooks[User]) {
+				<tr>
+					<td>
+						<h3>@book.Title</h3>
+						by @book.Author
+					</td>
+					<td>@book.ISBN</td>
+					<td>
+						<button @onclick="() => Return(book)" class="btn btn-primary">Return</button>
+					</td>
+				</tr>
+			}
+		}
+	</tbody>
+</table>
+
+@code {
+	int Id { get; set; }
+	string Name { get; set; }
+	string Email { get; set; }
+	User User { get; set; } = new User();
+
+
+	public async void Search(ChangeEventArgs e) {
+		try {
+			Id = int.Parse(e.Value?.ToString());
+		}
+		catch {
+			Id = 1;
+		}
+		User = Library.Users.FirstOrDefault(b => b.Id == Id);
+		if (User == null) {
+			Name = "";
+			Email = "";
+		}
+		else {
+			Name = User.Name;
+			Email = User.Email;
+		}
+		await InvokeAsync(StateHasChanged);
+	}
+
+	public async void Return(Book book) {
+		Library.ReturnBook(book, User);
+		await InvokeAsync(StateHasChanged);
+	}
+}

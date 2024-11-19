@@ -1,0 +1,38 @@
+﻿@page "/user/edit/{Id}"
+@using Lab5BlazorApp.Models
+@using Lab5BlazorApp.Services
+@inject ILibraryService Library
+@inject NavigationManager Navmgr
+
+<PageTitle>Edit User</PageTitle>
+
+<h1>Edit an existing user</h1>
+
+<form @onsubmit=Submit action="/">
+    <label for="name">Name: </label>
+    <input type="text" name="name" @bind=Name required />
+    <br />    <br />
+    <label for="email">Email: </label>
+    <input type="text" name="email" @bind=Email required />
+    <br />    <br />
+    <input type="submit" class="btn btn-danger" />
+</form>
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    string Name { get; set; }
+    string Email { get; set; }
+
+    protected override void OnInitialized() {
+        User user = Library.Users.FirstOrDefault(b => b.Id == int.Parse(Id));
+        Name = user.Name;
+        Email = user.Email;
+    }
+    public void Submit() {
+        User newuser = new User { Id = int.Parse(Id), Name=Name, Email=Email };
+        Library.EditUser(newuser);
+        Navmgr.NavigateTo("/users");
+    }
+}

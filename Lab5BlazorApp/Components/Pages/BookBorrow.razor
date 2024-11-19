@@ -1,0 +1,89 @@
+﻿@page "/book/borrow/{BookId}"
+@using Lab5BlazorApp.Models
+@using Lab5BlazorApp.Services
+@inject ILibraryService Library
+@inject NavigationManager Navmgr
+
+<PageTitle>Borrow Book</PageTitle>
+
+<h1>Borrow a book under your user ID</h1>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th class="col-6">Title</th>
+			<th class="col-10">ISBN</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<h3>@Title</h3>
+				by @Author
+			</td>
+			<td>@ISBN</td>
+		</tr>
+	</tbody>
+</table>
+
+<form @onsubmit=Submit action="/">
+    <label for="id">User ID: </label>
+    <input type="number" min="1" name="id" @bind=Id required @oninput=Search />
+    <br />    <br />
+    <h4>@Name</h4> <br />
+    <strong>@Email</strong>
+    <br />    <br />
+    <input type="submit" class="btn btn-danger" />
+</form>
+@if (ShowError) {
+    <div class="text-danger mt-2">
+        Please input a valid user ID.
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string BookId { get; set; }
+    public int Id { get; set; }
+    string Title { get; set; }
+    string Author { get; set; }
+    string ISBN { get; set; }
+    string Name { get; set; }
+    string Email { get; set; }
+    private bool ShowError { get; set; } = false;
+    Book book = new Book();
+
+    public async void Search(ChangeEventArgs e) {
+        try {
+            Id = int.Parse(e.Value?.ToString());
+        } catch {
+            Id = 1;
+        }
+        User user = Library.Users.FirstOrDefault(b => b.Id == Id);
+        if (user == null) {
+            Name = "";
+            Email = "";
+        } else {
+            Name = user.Name;
+            Email = user.Email;
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    protected override void OnInitialized() {
+        book = Library.Books.FirstOrDefault(b => b.Id == int.Parse(BookId));
+        Title = book.Title;
+        Author = book.Author;
+        ISBN = book.ISBN;
+    }
+
+    public void Submit() {
+        if (Name == "") {
+            ShowError = true;
+            return;
+        }
+        User user = new User { Id=Id, Email=Email,Name=Name};
+        Library.BorrowBook(book, user);
+        Navmgr.NavigateTo("/");
+    }
+}

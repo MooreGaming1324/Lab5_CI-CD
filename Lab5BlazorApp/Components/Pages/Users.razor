@@ -1,0 +1,43 @@
+﻿@page "/users"
+@using Lab5BlazorApp.Models
+@using Lab5BlazorApp.Services
+@inject ILibraryService Library
+
+<PageTitle>Users</PageTitle>
+
+<h1>Library Users <button onclick="location.href='user/add';" class="btn btn-success">Add User</button></h1>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th class="col-4">Name</th>
+			<th class="col-6">Email</th>
+			<th class="col-1">Edit</th>
+			<th class="col-2">Delete</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (User user in Library.Users) {
+			<tr>
+				<td>
+					<h3>@user.Name</h3>
+				</td>
+				<td>@user.Email</td>
+				<td>
+					<button onclick="location.href='user/edit/@user.Id';" class="btn btn-warning">Edit</button>
+				</td>
+				<td>
+					<button @onclick="() => Delete(user)" class="btn btn-danger">Delete</button>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+@code {
+
+	public async void Delete(User user) {
+		Library.DeleteUser(user);
+		await InvokeAsync(StateHasChanged);
+	}
+}
